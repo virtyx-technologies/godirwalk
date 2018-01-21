@@ -148,11 +148,11 @@ func walk(osPathname string, dirent *Dirent, options *Options) error {
 		if !dirent.IsDir() {
 			referent, err := os.Readlink(osPathname)
 			if err != nil {
-				return errors.Wrap(err, "cannot Readlink")
+				return nil
 			}
 			fi, err := os.Stat(filepath.Join(filepath.Dir(osPathname), referent))
 			if err != nil {
-				return errors.Wrap(err, "cannot Stat")
+				return nil
 			}
 			dirent.modeType = fi.Mode() & os.ModeType
 		}
@@ -165,7 +165,7 @@ func walk(osPathname string, dirent *Dirent, options *Options) error {
 	// If get here, then specified pathname refers to a directory.
 	deChildren, err := ReadDirents(osPathname, options.ScratchBuffer)
 	if err != nil {
-		return errors.Wrap(err, "cannot ReadDirents")
+		return nil
 	}
 
 	if !options.Unsorted {
@@ -177,7 +177,7 @@ func walk(osPathname string, dirent *Dirent, options *Options) error {
 		err = walk(osChildname, deChild, options)
 		if err != nil {
 			if err != filepath.SkipDir {
-				return err
+				return nil
 			}
 			// If received skipdir on a directory, stop processing that
 			// directory, but continue to its siblings. If received skipdir on a
@@ -192,11 +192,11 @@ func walk(osPathname string, dirent *Dirent, options *Options) error {
 					// is directory or not.
 					referent, err := os.Readlink(osChildname)
 					if err != nil {
-						return errors.Wrap(err, "cannot Readlink")
+						return nil
 					}
 					fi, err := os.Stat(filepath.Join(osPathname, referent))
 					if err != nil {
-						return errors.Wrap(err, "cannot Stat")
+						return nil
 					}
 					deChild.modeType = fi.Mode() & os.ModeType
 				}
